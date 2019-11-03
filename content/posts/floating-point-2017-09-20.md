@@ -1,7 +1,7 @@
 ---
 title: "64-bit floating point: a JavaScript story"
-date: 2019-11-02T19:22:12-07:00
-draft: true
+date: 2017-09-20T19:22:12-07:00
+draft: false
 ---
 
 Originally posted: 09/20/2017
@@ -38,7 +38,7 @@ It is a number format used by computers. It is also known as double-precision fl
   
 That 64 bits is split into three parts - 1 bit for the sign, 11 bits for the exponent and 52 bits for the fraction.
 
-![](/images/floating_point.png)  
+![](/blog/images/floating_point.png)  
 Source: [wikipedia.org](https://en.wikipedia.org/wiki/Double-precision_floating-point_format)
 
 Let's break this down further:  
