@@ -1,4 +1,5 @@
 baseURL = "http://sarafecadu.github.io/blog"
+relativeURLs = "false"
 languageCode = "en-us"
 title = "Sara Fecadu"
 theme = "minimal"
