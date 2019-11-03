@@ -3,21 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://http://sarafecadu.github.io/blog/about/</loc>
+    <loc>http://sarafecadu.github.io/blog/about/</loc>
     <lastmod>2019-11-02T19:17:24-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://http://sarafecadu.github.io/blog/</loc>
+    <loc>http://sarafecadu.github.io/blog/</loc>
     <lastmod>2019-11-02T19:17:24-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://http://sarafecadu.github.io/blog/categories/</loc>
+    <loc>http://sarafecadu.github.io/blog/posts/floating-point-2017-09-20/</loc>
+    <lastmod>2017-09-20T19:22:12-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://http://sarafecadu.github.io/blog/tags/</loc>
+    <loc>http://sarafecadu.github.io/blog/posts/</loc>
+    <lastmod>2017-09-20T19:22:12-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://sarafecadu.github.io/blog/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>http://sarafecadu.github.io/blog/tags/</loc>
   </url>
   
 </urlset>

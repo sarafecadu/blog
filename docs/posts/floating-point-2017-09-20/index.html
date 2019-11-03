@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>64-bit floating point: a JavaScript story</title>
+        
+        <style>
+
+    html body {
+        font-family: 'Raleway', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: purple;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="http://sarafecadu.github.io/blog/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"> 
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/sql.min.js"></script>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.59.1" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">64-bit floating point: a JavaScript story</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/blog/">Home</a></li>
+                            
+                                <li><a href="/blog/posts/">Posts</a></li>
+                            
+                        </ul>
+                    
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/sarafecadu"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/sarafecadu"><i class="fa fa-twitter"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://www.linkedin.com/in/sara-fecadu"><i class="fa fa-linkedin"></i></a></li>
+                            
+                        </ul>
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>64-bit floating point: a JavaScript story</h2>
+        <h5></h5>
+        
+
+    </div>
+
+    <div align="start" class="content">
+
+<p>Originally posted: 09/20/2017</p>
+
+<p>In this post, I’ll shed some light on how JavaScript handles its numbers. We will go down to the binary and back up.</p>
+
+<h4 id="why-write-about-numbers-in-javascript">Why write about numbers in JavaScript?</h4>
+
+<p>It seems to be common knowledge that JavaScript has a single and unpredictable number type, 64-bit floating point. Watch out!
+But, whenever I look for more information on what to watch out for,I see the exact same example:</p>
+
+<pre><code class="language-javascript">&gt; 0.1 + 0.2
+&gt; 0.30000000000000004
+</code></pre>
+
+<p>Okay. JavaScript’s weird? I guess. But why does it do that?
+By the end of this post, hopefully it’ll be clear exactly how JavaScript internally represents numbers in binary and how that causes this result to be perfectly reasonable to a JavaScript engine.</p>
+
+<h4 id="where-might-number-related-inconsistencies-appear-in-our-code">Where might number-related inconsistencies appear in our code?</h4>
+
+<p>Anywhere. I’ve come across three distinct instances this past year.</p>
+
+<ol>
+<li><p>Last February, I was building a data visualization for mobile phone subscriptions in North Africa. The dataset ran from 1980–2014. As you can imagine, the number of mobile phone subscriptions per 100,000 persons in North Africa in 1980 were miniscule. In fact, they were so tiny that when calculating the SVG coordinates using d3.js’ <code>.line()</code> method, it returned <code>NaN</code>. Weird.</p></li>
+
+<li><p>This past June, I was attempting to convert a string to a number as part of a LeetCode challenge. I couldn’t consistently convert an “integer string” (string made up of integer values) into a number if it was over 16 digits.
+I wrote a blog post, leaving out the binary, focusing on the fact that you should expect unexpected results when working with numbers over 16 digits, big or small.</p></li>
+
+<li><p>Last weekend, I participated in a mock interview. The question was how to find the square root of a number without using <code>Math.sqrt()</code>. After writing a binary search function, the interviewer asked for me to walk through the function when the input is equal to 2,000,000. Part of that function takes 1,000,000 (the midpoint) and multiplies it by itself (or x², where x is the input). Which, won’t work in some number systems, but I thought it might just work in 64-bit floating point. It is less than the magical 16 digit mark!</p></li>
+</ol>
+
+<p>This is just a small number anecdotal experiences from an early career front-end dev who doesn’t work with large amounts of data regularly. I am sure there are many other interesting examples as you dig into web payments, databases, etc.</p>
+
+<h4 id="what-is-64-bit-floating-point">What is 64-bit floating point?</h4>
+
+<p>It is a number format used by computers. It is also known as double-precision floating point. It takes 8 bytes (or 64 bits) in a computers memory.</p>
+
+<p>That 64 bits is split into three parts - 1 bit for the sign, 11 bits for the exponent and 52 bits for the fraction.</p>
+
+<p><img src="/blog/images/floating_point.png" alt="" /><br />
+Source: <a href="https://en.wikipedia.org/wiki/Double-precision_floating-point_format">wikipedia.org</a></p>
+
+<p>Let&rsquo;s break this down further:</p>
+
+<ul>
+<li><p>The sign represents whether the number is positive or negative. If it is 0, the value is positive. If it is 1, the value is negative.</p></li>
+
+<li><p>The exponent indicates how many digits left or right the floating point should be shifted. This type of exponent is called a biased exponent. It takes information from the fraction in order to scale up or down the final result.</p></li>
+
+<li><p>The fraction (sometimes also called the significand or mantissa) represents the binary digits of the number.</p>
+
+<ul>
+<li>It can represent whole numbers or decimal values, but they will share the 52 bits. The space at which whole numbers and decimal values exists floats up and down the 52 bits — hence the name floating point.</li>
+<li>The whole numbers are represented in binary using 2^x and the decimals are represented using 2^-x (or <sup>1</sup>&frasl;<sub>2</sub>^x).
+<br /></li>
+</ul></li>
+</ul>
+
+<p>Before we get to our test cases, I’d recommend the following resources:</p>
+
+<ul>
+<li><p>Vaidehi Joshi’s blog post, <a href="https://medium.com/basecs/bits-bytes-building-with-binary-13cb4289aafa">Bits, Bytes, and Binary</a>. It is an incredible resource for demystifying binary numbers. I highly recommend her whole BaseCS series. But, be sure to start with this post!</p></li>
+
+<li><p>Bartek Szopka’s talk, <a href="https://youtu.be/MqHDDtVYJRI">Everything you never wanted to know about JavaScript numbers</a>. In addition to being a great talk, there is information on how JavaScript represents numbers in special cases that I didn’t mention above.</p></li>
+
+<li><p>Dr. Axel Rauschmayer’s blog post, <a href="https://2ality.com/2012/04/number-encoding.html">How numbers are encoded in JavaScript</a>. This post and his chapter on numbers in Speaking JavaScript are a deeper dive into the number system than I will attempt to cover in this post.</p></li>
+</ul>
+
+<h4 id="the-test-cases">The Test Cases</h4>
+
+<p>Test Case One:<br />
+1000000 x 1000000 = 1000000000000</p>
+
+<p>A million multiplied by itself is a lot. However, JavaScript provides a <code>Number.MAX_SAFE_INTEGER</code> constant equal to 9007199254740991. And 9007199254740991 is greater than 1000000² (or a million multiplied by a million).</p>
+
+<p>But, if JavaScript only has 64-bit floating point numbers, why are we talking about a max integer value?</p>
+
+<p>JavaScript does only have one number type, but integers can be represented in 64-bit floating point up to 52 bits (with 1 bit for the exponent). If the number changes through an operation, it may not be an integer any longer. Additionally, when using bitwise operators, you may artificially limit your integer value to 32 bits.</p>
+
+<p>Two simplifications we can make:</p>
+
+<ol>
+<li><p>An integer is a number without a decimal and will be represented in 64-bit floating point behind the scenes.</p></li>
+
+<li><p>As long as you’re working with integer values less than <code>Number.MAX_SAFE_INTEGER</code> and greater than <code>Number.MIN_SAFE_INTEGER</code>, you’re going to get a consistent result.</p></li>
+</ol>
+
+<p>If you’re working with values close to or larger than the max integer value or smaller than the min integer value, you can either check your input value against the constants (<code>Number.MAX_SAFE_INTEGER</code> or <code>Number.MIN_SAFE_INTEGER</code>) or use a library that specializes in working with arbitrarily large numbers.</p>
+
+<hr />
+
+<p>Test Case Two:<br />
+0.1 + 0.2 = 0.30000000000000004</p>
+
+<p>The tricky part of this expression is that it seems like a trick. Where did the 4 come from? Something I hadn’t considered until I spent an afternoon converting numbers to binary and back is that it probably wasn’t intended to be a 4.</p>
+
+<p>Above is the IEE 754 representation of our results. Now, let’s investigate this hunch:</p>
+
+<pre><code class="language-txt">100 in binary is 4. 
+2² = 4, 4–4 =0, our binary represents the places filled by 2² 2¹ 2⁰
+</code></pre>
+
+<p>In JavaScript numbers, generally, any digits that exceed the 52 bits provided by the fraction (or significand) are assumed to be 0 and discarded.</p>
+
+<p>Numbers entered into JavaScript are decimal floating-point numbers and are then internally represented as binary floating-point numbers. That conversion for decimal floating-point numbers whose prime factors include anything other than 2 will lead to imperfect results.</p>
+
+<p>For example:</p>
+
+<pre><code class="language-txt">0.125 in decimal = 125/1000 = 1/8 = 0.001 in binary
+0.1 in decimal = 1/10 = 1/2*5
+0.2 in decimal = 1/20 = 1/2*2*5
+</code></pre>
+
+<p>And as we discussed before, the decimal values in our binary representation are defined using 2^-x (or <sup>1</sup>&frasl;<sub>2</sub>^x). However, if there is no way to cleanly find a exponent that our number goes into we’ll continue to get back decimal/fraction results until we run out of bits in our internal representation.</p>
+
+<p>When the conversion exhausts its bits, it’ll store the result. Which in this case ends in 100 in binary or 4 as a decimal value.</p>
+
+<h4 id="summary">Summary</h4>
+
+<ul>
+<li>JavaScript has one number type.</li>
+<li>It’s called 64-bit floating point.</li>
+<li>It is defined by the IEE 754 standard.</li>
+</ul>
+
+<p>It is pretty nice, except if you’re a decimal whose factors are anything other than 2 or if you are a number with more than 16 digits.</p>
+
+<p>To avoid exceeding the bits provided to we can compare our input against <code>Number.MAX_SAFE_INTEGER</code> and <code>Number.MIN_SAFE_INTEGER</code>.
+To avoid rounding errors with fractions, we can scale up our result to an integer and scale back later on.
+For example:</p>
+
+<pre><code class="language-txt">0.1 * 10 = 1.0
+0.2 * 10 = 2.0 
+           3.0/10 = .3
+</code></pre>
+
+<h4 id="where-to-go-from-here">Where to go from here?</h4>
+
+<p>Here are a few tools that you can play around with. Otherwise, enjoy your additional knowledge about JavaScript and its number quirks.</p>
+
+<ul>
+<li><p><a href="http://bartaz.github.io/ieee754-visualization/">IEE 754 Visualization Tool</a> by Bartek Szopka</p></li>
+
+<li><p><a href="http://dherman.github.io/float.js/">Float Explorer</a> by Dave Herman</p></li>
+</ul>
+</div>
+
+</main>
+
+        <footer>
+            
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
