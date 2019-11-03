@@ -14,7 +14,7 @@ It seems to be common knowledge that JavaScript has a single and unpredictable n
 But, whenever I look for more information on what to watch out for,I see the exact same example:
 ```javascript
 > 0.1 + 0.2
-> 0.30000000000000004
+  0.30000000000000004
 ``` 
 
 Okay. JavaScript’s weird? I guess. But why does it do that?
@@ -66,6 +66,14 @@ Test Case One:
 
 A million multiplied by itself is a lot. However, JavaScript provides a `Number.MAX_SAFE_INTEGER` constant equal to 9007199254740991. And 9007199254740991 is greater than 1000000² (or a million multiplied by a million).
 
+```javascript
+> 1000000 * 1000000
+  1000000000000
+
+> 1000000000000 < 9007199254740991
+  true
+```
+
 But, if JavaScript only has 64-bit floating point numbers, why are we talking about a max integer value?  
   
 JavaScript does only have one number type, but integers can be represented in 64-bit floating point up to 52 bits (with 1 bit for the exponent). If the number changes through an operation, it may not be an integer any longer. Additionally, when using bitwise operators, you may artificially limit your integer value to 32 bits.  
@@ -85,7 +93,10 @@ Test Case Two:
   
 The tricky part of this expression is that it seems like a trick. Where did the 4 come from? Something I hadn’t considered until I spent an afternoon converting numbers to binary and back is that it probably wasn’t intended to be a 4.
   
-Above is the IEE 754 representation of our results. Now, let’s investigate this hunch:
+![](/blog/images/floating_point2.png)
+
+Above is the IEE 754 representation of our results.   
+Now, let’s investigate this hunch:
   
 ```txt
 100 in binary is 4. 

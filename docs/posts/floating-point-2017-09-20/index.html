@@ -76,7 +76,6 @@
         
 
         
-
     </head>
 
     <body>
@@ -139,7 +138,7 @@
 But, whenever I look for more information on what to watch out for,I see the exact same example:</p>
 
 <pre><code class="language-javascript">&gt; 0.1 + 0.2
-&gt; 0.30000000000000004
+  0.30000000000000004
 </code></pre>
 
 <p>Okay. JavaScript’s weird? I guess. But why does it do that?
@@ -202,6 +201,13 @@ Source: <a href="https://en.wikipedia.org/wiki/Double-precision_floating-point_f
 
 <p>A million multiplied by itself is a lot. However, JavaScript provides a <code>Number.MAX_SAFE_INTEGER</code> constant equal to 9007199254740991. And 9007199254740991 is greater than 1000000² (or a million multiplied by a million).</p>
 
+<pre><code class="language-javascript">&gt; 1000000 * 1000000
+  1000000000000
+
+&gt; 1000000000000 &lt; 9007199254740991
+  true
+</code></pre>
+
 <p>But, if JavaScript only has 64-bit floating point numbers, why are we talking about a max integer value?</p>
 
 <p>JavaScript does only have one number type, but integers can be represented in 64-bit floating point up to 52 bits (with 1 bit for the exponent). If the number changes through an operation, it may not be an integer any longer. Additionally, when using bitwise operators, you may artificially limit your integer value to 32 bits.</p>
@@ -223,7 +229,10 @@ Source: <a href="https://en.wikipedia.org/wiki/Double-precision_floating-point_f
 
 <p>The tricky part of this expression is that it seems like a trick. Where did the 4 come from? Something I hadn’t considered until I spent an afternoon converting numbers to binary and back is that it probably wasn’t intended to be a 4.</p>
 
-<p>Above is the IEE 754 representation of our results. Now, let’s investigate this hunch:</p>
+<p><img src="/blog/images/floating_point2.png" alt="" /></p>
+
+<p>Above is the IEE 754 representation of our results.<br />
+Now, let’s investigate this hunch:</p>
 
 <pre><code class="language-txt">100 in binary is 4. 
 2² = 4, 4–4 =0, our binary represents the places filled by 2² 2¹ 2⁰
