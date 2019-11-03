@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Sara Fecadu</title>
-    <link>http://sarafecadu.github.io/blog/</link>
+    <link>https://sarafecadu.github.io/blog/</link>
     <description>Recent content on Sara Fecadu</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 02 Nov 2019 19:17:24 -0700</lastBuildDate>
     
-	<atom:link href="http://sarafecadu.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://sarafecadu.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>About me</title>
-      <link>http://sarafecadu.github.io/blog/about/</link>
+      <link>https://sarafecadu.github.io/blog/about/</link>
       <pubDate>Sat, 02 Nov 2019 19:17:24 -0700</pubDate>
       
-      <guid>http://sarafecadu.github.io/blog/about/</guid>
+      <guid>https://sarafecadu.github.io/blog/about/</guid>
       <description>Who am I? Hi, my name is Sara Fecadu. I&amp;rsquo;m a software engineer at Nordstrom.</description>
     </item>
     
     <item>
       <title>64-bit floating point: a JavaScript story</title>
-      <link>http://sarafecadu.github.io/blog/posts/floating-point-2017-09-20/</link>
+      <link>https://sarafecadu.github.io/blog/posts/floating-point-2017-09-20/</link>
       <pubDate>Wed, 20 Sep 2017 19:22:12 -0700</pubDate>
       
-      <guid>http://sarafecadu.github.io/blog/posts/floating-point-2017-09-20/</guid>
+      <guid>https://sarafecadu.github.io/blog/posts/floating-point-2017-09-20/</guid>
       <description>Originally posted: 09/20/2017
 In this post, I’ll shed some light on how JavaScript handles its numbers. We will go down to the binary and back up.
 Why write about numbers in JavaScript? It seems to be common knowledge that JavaScript has a single and unpredictable number type, 64-bit floating point. Watch out! But, whenever I look for more information on what to watch out for,I see the exact same example:</description>
